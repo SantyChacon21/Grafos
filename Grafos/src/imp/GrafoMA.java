@@ -1,6 +1,5 @@
 package imp;
 
-import api.ConjuntoTDA;
 import api.GrafoTDA;
 
 public class GrafoMA implements GrafoTDA {
@@ -10,47 +9,39 @@ public class GrafoMA implements GrafoTDA {
 	int [] verticeIndice; //creamos una lista paralela a etiquetas
 	int cantidad;
 	int mx = 55;
-	int mx_etiquetas = 500; //le damos un maximo a la lista
 	
 	@Override
-	public void inicializarGrafo() {
+	public void inicializarGrafo() { // O(n)
 		mAdy = new int[mx][mx];
 		etiquetas = new int[mx];
-		verticeIndice= new int[mx_etiquetas];
+		verticeIndice= new int[mx];
 
 		cantidad = 0;
 
-		//para marcar que no existe usamos -1
-		for(int i=0;i<mx_etiquetas;i++){
-
+		for(int i=0;i<mx;i++){
+			mAdy[i][cantidad] = 0;
+			mAdy[cantidad][i] = 0;
 			verticeIndice[i]=-1;
 
 		}
 	}
 
 	@Override
-	public void agregarVertice(int v) {
+	public void agregarVertice(int v) {// O(cte)
 		etiquetas[cantidad] = v;
-		verticeIndice[v]= cantidad; //guardamos el indice del vertice guardado
-		for (int i = 0; i <= cantidad; i++) {
-			mAdy[i][cantidad] = 0;
-			mAdy[cantidad][i] = 0;
-		}
+		verticeIndice[v]= cantidad; 
 		cantidad++;
 	}
 
 	@Override
-	public void eliminarVertice(int v) {
+	public void eliminarVertice(int v) { // O(n)
 		int inx = verticeIndice[v];
 		cantidad--;
 
-		//actualizar la lista
 		etiquetas[inx] = etiquetas[cantidad];
 		verticeIndice[etiquetas[cantidad]]=inx;
 		verticeIndice[v]=-1;
 
-
-		//reordenar la matriz
 
 		for(int i=0; i<cantidad; i++){
 			mAdy[inx][i]=mAdy[cantidad][i];
@@ -59,41 +50,57 @@ public class GrafoMA implements GrafoTDA {
 
 	}
 
-	@Override
-	public ConjuntoTDA vertices() {
-		ConjuntoTDA v = new ConjuntoLD();
-		v.inicializarConjunto();
-		for (int i = 0; i < cantidad; i++)
-			v.agregar(etiquetas[i]);
-		return v;
-	}
 
 	@Override
-	public void agregarArista(int origen, int destino, int peso) {
+	public void agregarArista(int origen, int destino, int peso) { // O(cte)
 		int o = verticeIndice[origen];
 		int d = verticeIndice[destino];
 		mAdy[o][d] = peso;
 	}
 
 	@Override
-	public void eliminarArista(int origen, int destino) {
+	public void eliminarArista(int origen, int destino) { // O(cte)
 		int o = verticeIndice[origen];
 		int d = verticeIndice[destino];
 		mAdy[o][d] = 0;
 	}
 
 	@Override
-	public boolean existeArista(int origen, int destino) {
+	public boolean existeArista(int origen, int destino) { // O(cte)
 		int o = verticeIndice[origen];
 		int d = verticeIndice[destino];
 		return (mAdy[o][d] != 0);
 	}
 
 	@Override
-	public int pesoArista(int origen, int destino) {
+	public int pesoArista(int origen, int destino) { // O(cte)
 		int o = verticeIndice[origen];
 		int d = verticeIndice[destino];
 		return mAdy[o][d];
 	}
+
+	//funcion de prueba para imprimir matriz
+	public void imprimirMatrizAdyacencia() { // O(n**2)
+    System.out.print("     ");
+		for (int i = 0; i < cantidad; i++) {
+			System.out.printf("%4d", etiquetas[i]);
+		}
+		System.out.println();
+		System.out.println("    " + "----".repeat(cantidad));
+
+		for (int i = 0; i < cantidad; i++) {
+			System.out.printf("%4d|", etiquetas[i]);
+			for (int j = 0; j < cantidad; j++) {
+				if (mAdy[i][j] == 0) {
+					System.out.print("   -");
+				} else {
+					System.out.printf("%4d", mAdy[i][j]);
+				}
+			}
+			System.out.println();
+		}
+}
+
+
 
 }
